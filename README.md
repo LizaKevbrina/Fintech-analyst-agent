@@ -1,6 +1,8 @@
 <div align="center">
 
-# FinTech Analyst Agent - MVP
+# FinTech Analyst Agent
+
+AI-powered финансовый аналитик для автоматического анализа отчетов, извлечения KPI и распознавания графиков
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -8,10 +10,99 @@
 [![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
- AI-powered финансовый аналитик для автоматического анализа отчетов, извлечения KPI и распознавания графиков
-
 </div>
 
+---
+
+🔍 Что делает этот агент
+
+### AI-финансовый аналитик документов
+
+**Описание**  
+AI-агент анализирует финансовые отчёты компаний:
+- извлекает текст, таблицы и графики  
+- находит ключевые метрики (выручка, EBITDA, ROE, рост)  
+- сопоставляет отчёты с архивом  
+- возвращает **структурированный результат**, готовый для BI и аналитики  
+
+**Зачем бизнесу**
+- ускоряет анализ отчётов в **3–5 раз**
+- снижает нагрузку на аналитиков
+- минимизирует человеческие ошибки
+- масштабируется под поток документов
+  
+##  Ключевые возможности
+- ✅ Анализ финансовых отчётов (PDF, Excel)
+- ✅ Извлечение KPI в структурированном виде
+- ✅ Распознавание и анализ графиков (Vision API)
+- ✅ Семантический поиск по архиву отчётов (RAG)
+- ✅ SQL-генерация и вычисления через инструменты
+- ✅ Валидация результатов (Pydantic)
+- ✅ REST API для интеграции в бизнес-системы
+
+---
+
+##  Architecture
+
+```
+┌─────────────┐
+│   User      │
+└──────┬──────┘
+       │ Upload PDF/Excel
+       ↓
+┌─────────────────────────────┐
+│   FastAPI Endpoint          │
+│   - Rate Limiting           │
+│   - Input Validation        │
+└──────┬──────────────────────┘
+       │
+       ↓
+┌─────────────────────────────┐
+│   FinancialAnalystAgent     │
+│   (SmolAgents)              │
+├─────────────────────────────┤
+│   Tools:                    │
+│   - PDF Parser              │
+│   - Excel Parser            │
+│   - Vision Analyzer         │
+│   - FAISS Search            │
+│   - Calculator              │
+│   - SQL Generator (CodeAgent)│
+└──────┬──────────────────────┘
+       │
+       ↓
+┌─────────────────────────────┐
+│   Structured Output         │
+│   (Pydantic Validation)     │
+└─────────────────────────────┘
+```
+
+### Agent Workflow
+```
+1. Document Parsing
+   ├── PDF: pdfplumber → extract text, tables, images
+   └── Excel: openpyxl → extract sheets, formulas
+
+2. Semantic Search (FAISS)
+   └── Find similar reports in archive
+
+3. Chart Analysis (Vision API)
+   ├── Extract charts from document
+   ├── Send to Claude Vision
+   ├── Graceful degradation if API fails
+   └── Return structured ChartAnalysis
+
+4. KPI Extraction (ToolCallingAgent)
+   ├── Build extraction prompt
+   ├── Use tools: search, calculate, SQL generate
+   ├── Extract metrics from text/tables
+   └── Validate with Pydantic
+
+5. Result Assembly
+   └── Create AnalysisResult with all data
+```
+
+---
 ##  Technology Stack
 
 | Category | Technology |
@@ -78,67 +169,6 @@ docker-compose up --build
 
 # 3. Access API
 open http://localhost:8000/docs
-```
----
-
-##  Architecture
-
-```
-┌─────────────┐
-│   User      │
-└──────┬──────┘
-       │ Upload PDF/Excel
-       ↓
-┌─────────────────────────────┐
-│   FastAPI Endpoint          │
-│   - Rate Limiting           │
-│   - Input Validation        │
-└──────┬──────────────────────┘
-       │
-       ↓
-┌─────────────────────────────┐
-│   FinancialAnalystAgent     │
-│   (SmolAgents)              │
-├─────────────────────────────┤
-│   Tools:                    │
-│   - PDF Parser              │
-│   - Excel Parser            │
-│   - Vision Analyzer         │
-│   - FAISS Search            │
-│   - Calculator              │
-│   - SQL Generator (CodeAgent)│
-└──────┬──────────────────────┘
-       │
-       ↓
-┌─────────────────────────────┐
-│   Structured Output         │
-│   (Pydantic Validation)     │
-└─────────────────────────────┘
-```
-
-### Agent Workflow
-```
-1. Document Parsing
-   ├── PDF: pdfplumber → extract text, tables, images
-   └── Excel: openpyxl → extract sheets, formulas
-
-2. Semantic Search (FAISS)
-   └── Find similar reports in archive
-
-3. Chart Analysis (Vision API)
-   ├── Extract charts from document
-   ├── Send to Claude Vision
-   ├── Graceful degradation if API fails
-   └── Return structured ChartAnalysis
-
-4. KPI Extraction (ToolCallingAgent)
-   ├── Build extraction prompt
-   ├── Use tools: search, calculate, SQL generate
-   ├── Extract metrics from text/tables
-   └── Validate with Pydantic
-
-5. Result Assembly
-   └── Create AnalysisResult with all data
 ```
 
 ---
